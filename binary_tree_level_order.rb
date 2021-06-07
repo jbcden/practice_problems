@@ -40,32 +40,23 @@ end
 def level_order(root)
   return [] if root.nil?
 
-  _level_order([root], [])
+  _level_order(root, [], 0)
 end
 
-def _level_order(level_nodes, list)
-  return [] if level_nodes.empty?
+def _level_order(node, list, level)
+  list[level] ||= []
+  list[level] << node.val
 
-  if list.empty?
-    node = level_nodes.pop
-    list << [node.val]
-
-    _level_order([node.left, node.right].compact, list)
-  else
-    # p list
-    vals = level_nodes.map { |node| node&.val }.compact
-    list << vals
-    # p list
-
-    nodes = level_nodes.map { |node| [node&.left, node&.right] }.flatten.compact
-    _level_order(nodes, list)
-  end
+  _level_order(node.left, list, level + 1) if node.left
+  _level_order(node.right, list, level + 1) if node.right
 
   list
 end
 
-list = [1]
-root = TreeNode.from_list(list)
-p root
+# list = [1]
+# root = TreeNode.from_list(list)
+# p level_order(root)
 
+list = [3, 9, 20, nil, nil, 15, 7]
+root = TreeNode.from_list(list)
 p level_order(root)
