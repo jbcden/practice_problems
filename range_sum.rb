@@ -1,33 +1,21 @@
 class NumArray
   def initialize(nums)
     @nums = nums
+    @cache = []
+    @cache[0] = 0
+
+    sum = 0
+    nums.each_with_index do |n, index|
+      @cache[index + 1] = @cache[index] + n
+    end
   end
 
   def sum_range(left, right)
-    return @nums[left] if left == right
-
-    tmp_right = left + 1
-    previous_value = @nums[left]
-    while tmp_right <= right do
-      # p tmp_right, cache
-      # p tmp_right
-      if previous_value
-        previous_value = previous_value + @nums[tmp_right]
-
-        tmp_right += 1
-      else
-        p 'SHOULD NOT HAPPEN'
-        tmp_right -= 1
-      end
-    end
-
-    # p @cache
-
-    previous_value
+    @cache[right + 1] - @cache[left]
   end
 end
 
-numArray = NumArray.new([-2, 0, 3, -5, 2, -1])
+# numArray = NumArray.new([-2, 0, 3, -5, 2, -1])
 # p numArray.sum_range(0, 2) # return (-2) + 0 + 3 = 1
 # p numArray.sum_range(2, 5) # return 3 + (-5) + 2 + (-1) = -1
 # p numArray.sum_range(0, 5) # return (-2) + 0 + 3 + (-5) + 2 + (-1) = -3
@@ -51,4 +39,3 @@ end
 #   p 'INPUT', left, right
 #   p numArray.sum_range(left, right) #
 # end
-

@@ -1,96 +1,66 @@
 def num_decodings(s)
   return 0 if s[0] == '0'
+  return 1 if s.size == 1
 
   nums = s.split(//).map(&:to_i)
 
-  if nums.size == 2
-    if nums[0] == 2 && nums[1] < 7
-      return 2
-    elsif nums[0] == 1 && nums[1] > 0
-      return 2
-    elsif nums[0] == 1 && nums[1].zero?
-      return 1
-    end
-  end
-
-  index = 0
   choice_size = s.length
-  choices_per_number = []
-
-  while index < choice_size
-    if index == choice_size - 1
-      if nums[index].zero?
-        choices_per_number[index] = 0
-      else
-        choices_per_number[index] = 1
-      end
-      index += 1
-
-      next
-    end
-
-    current = nums[index]
-    incoming = nums[index + 1]
-
-    if current.zero?
-      choices_per_number[index] = 0
-      index += 1
-      next
-    end
-
-    if current == 2
-      if incoming < 7 && incoming > 0
-        choices_per_number[index] = 2
-      else
-        choices_per_number[index] = 1
-      end
-    elsif current == 1 && incoming > 0
-      choices_per_number[index] = 2
-    else
-      choices_per_number[index] = 1
-    end
-
-    index += 1
+  first, second = nums[0..1]
+  if first == 1 && second > 0 || (first == 2 && second < 7 && second > 0)
+    choices_at_each_index = [1, 2]
+  elsif first > 2 && second.zero?
+    return 0
+  else
+    choices_at_each_index = [1, 1]
   end
 
-  p choices_per_number
+  return choices_at_each_index[1] if nums.size == 2
+  nums_index = 2
+  choices_index = 2
 
-  permutations = 0
-  choices_per_number.each_with_index do |number_of_choices, index|
-    next if index == choice_size - 1
-    return 0 if index == choice_size - 2 && number_of_choices == 1 && choices_per_number[index + 1]&.zero?
-    # permutations += 1 if index == choice_size - 1 && number_of_choices == 1 && choices_per_number[index - 1] != 0
-    next if number_of_choices.zero?
-    # return 0 if number_of_choices == 1 && choices_per_number[index + 1]&.zero?
-    # next if number_of_choices == 1
-    next if index + 2 <= choice_size - 1 && choices_per_number[index + 2].zero?
+  # cases:
+  # 1. combinable: add two previous
+  # 2. non-combinable: 1
+  # 4. 0: value of (index - 2)
+  while nums_index < choice_size
+    current_number = nums[nums_index]
+    previous_number = nums[nums_index - 1]
 
-    # p '*' * 90
-    # p 'NANI??', index, number_of_choices
-    # p '*' * 90
-    if index + 2 >= choice_size
-      # permutations += choices_per_number[-1]
-      permutations += number_of_choices
+    if current_number.zero? && (previous_number != 1 && previous_number != 2)
+      return 0
+    elsif current_number.zero?
+      choices_at_each_index[choices_index] = choices_at_each_index[choices_index - 2]
+    elsif previous_number == 1 || (previous_number == 2 && current_number < 7)
+      choices_at_each_index[choices_index] = choices_at_each_index[choices_index - 1] + choices_at_each_index[choices_index - 2]
     else
-      permutations += 2
+      choices_at_each_index[choices_index] = choices_at_each_index[choices_index - 1]
     end
+
+    nums_index += 1
+    choices_index += 1
   end
 
-  permutations
+  choices_at_each_index[choice_size - 1]
 end
 
-# p num_decodings('12') # 2
-# 
-# p num_decodings('2260') # 0
-# 
-# p num_decodings('2210') # 2
-# 
-# p num_decodings('2126') # 5
-# 
-# p num_decodings('27234') # 2
-# 
-# p num_decodings('10') # 1
-# 
-# p num_decodings('2101') # 1
+p num_decodings('12') # 2
 
-p num_decodings("1201234") # 3
+p num_decodings('2260') # 0
+
+p num_decodings('2210') # 2
+
+p num_decodings('2126') # 5
+
+p num_decodings('27234') # 2
+
+p num_decodings('10') # 1
+
+p num_decodings('2101') # 1
+
+p num_decodings('1201234') # 3
+
+p num_decodings('207') # 1
+
+p num_decodings('2611055971756562') # 4
+
+p num_decodings('301') # 0

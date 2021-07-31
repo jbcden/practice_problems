@@ -5,9 +5,7 @@ def max_profit(prices)
   return 0 if prices.size <= 1
   final_day = prices.size - 1
   profits = Array.new(prices.size - 1) { Array.new(prices.size, 0) }
-
-  max_for_day = {}
-  max_so_far_for_day = 0
+  max_profit_by_sell_date = Array.new(prices.size - 1) { Array.new(prices.size, 0) }
 
   max_so_far = 0
   start_day = 0
@@ -22,30 +20,28 @@ def max_profit(prices)
         previous_possible_buy_day = buy_day - 3
         previous_possible_sell_day = buy_day - 2
 
-        # p buy_day, sell_day
-        # p previous_possible_buy_day, previous_possible_sell_day
-        max_previous_possible_profit = 0
-        while previous_possible_buy_day >= 0
-          current_day_max = profits[previous_possible_buy_day][(previous_possible_buy_day + 1)..previous_possible_sell_day].max
-          max_previous_possible_profit = current_day_max if current_day_max > max_previous_possible_profit
-          max_previous_possible_profit = 0 if max_previous_possible_profit < 0
-
-          previous_possible_buy_day -= 1
-        end
+        max_previous_possible_profit = max_profit_by_sell_date[previous_possible_buy_day][previous_possible_sell_day]
+        max_previous_possible_profit = 0 if max_previous_possible_profit < 0
 
         profit = profit + max_previous_possible_profit
-        profits[buy_day][sell_day] = profit
       end
 
-      max_so_far_for_day = profit if profit > max_so_far_for_day
+      profits[buy_day][sell_day] = profit
+
+      previous_buy_for_max = if buy_day - 1 < 0
+                               0
+                             else
+                               buy_day - 1
+                             end
+      max_previous_buy_for_same_sell_date = max_profit_by_sell_date[previous_buy_for_max][sell_day]
+      max_buy_yesterday = max_profit_by_sell_date[buy_day][sell_day - 1]
+      current_max = [max_buy_yesterday, max_previous_buy_for_same_sell_date, profit].max
+      max_profit_by_sell_date[buy_day][sell_day] = current_max
+
       max_so_far = profit if profit > max_so_far
     end
-    max_for_day[buy_day] = max_so_far_for_day
-    max_so_far_for_day = 0
   end
 
-  # p profits
-  # p max_for_day
   max_so_far
 end
 
